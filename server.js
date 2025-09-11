@@ -1,16 +1,30 @@
-const express = require('express');
-const dotenv = require('dotenv');
-const userRoutes = require('./routes/userRoutes');
+// server.js
+const express = require("express");
+const dotenv = require("dotenv");
+const cors = require("cors");
+const userRoutes = require("./routes/userRoutes");
+const path = require("path"); // Untuk melayani file statis
 
 dotenv.config();
+
 const app = express();
 const port = process.env.PORT || 3000;
 
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(cors()); // Aktifkan CORS untuk semua origin
+app.use(express.json()); // Untuk parsing body JSON
 
-app.use('/users', userRoutes);
+// Melayani file statis dari folder 'public'
+app.use(express.static(path.join(__dirname, "public")));
 
-app.listen(port, '0.0.0.0', () => {
-  console.log(`✅ Backend berjalan di http://0.0.0.0:${port}`);
+// Rute API
+app.use("/users", userRoutes);
+
+// Rute root untuk index.html
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+// Jalankan server
+app.listen(port, () => {
+  console.log(`Server berjalan di http://localhost:${port}`);
 });
